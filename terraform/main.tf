@@ -1,57 +1,36 @@
-name: Terraform CI/CD with Smoke Tests
+provider "google" {
+  project     = "sampleproject-492912"
+  region      = "US"
+  credentials = file("key.json")
+}
 
-on:
-  push:
-    branches: [ main ]
+# Dataset
+resource "google_bigquery_dataset" "learnco" {
+  dataset_id = "learnco_analytics"
+  location   = "US"
+}
 
-jobs:
+# Course Performance Table
+resource "google_bigquery_table" "course_performance" {
+  dataset_id = google_bigquery_dataset.learnco.dataset_id
+  table_id   = "course_performance"
 
-  terraform:
-    name: Terraform Apply
-    runs-on: ubuntu-latest
+  schema = file("course_performance_schema.json")
 
-    steps:
-      - name: Checkout Repo
-        uses: actions/checkout@v4
+  deletion_protection = false
+}
 
-      - name: Authenticate to GCP
-        uses: google-github-actions/auth@v2
-        with:
-          credentials_json: '${{ secrets.GCP_KEY }}'
+# Student Engagement Table (Partitioned)
+resource "google_bigquery_table" "student_engagement" {
+  dataset_id = google_bigquery_dataset.learnco.dataset_id
+  table_id   = "student_engagement"
 
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
+  schema = file("student_engagement_schema.json")
 
-      - name: Terraform Init
-        run: terraform init
-        working-directory: terraform
+  deletion_protection = false
 
-      - name: Terraform Apply
-        run: terraform apply -auto-approve
-        working-directory: terraform
-
-
-  smoke_tests:
-    name: Smoke Tests
-    runs-on: ubuntu-latest
-    needs: terraform   # 👈 VERY IMPORTANT
-
-    steps:
-      - name: Checkout Repo
-        uses: actions/checkout@v4
-
-      - name: Authenticate to GCP
-        uses: google-github-actions/auth@v2
-        with:
-          credentials_json: '${{ secrets.GCP_KEY }}'
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-
-      - name: Install Dependencies
-        run: pip install -r requirements.txt
-
-      - name: Run Smoke Tests
-        run: python scripts/smoke_test.py
+  time_partitioning {
+    type  = "DAY"
+    field = "registration_date"
+  }
+}
