@@ -1,0 +1,11 @@
+[
+  { "name": "student_id", "type": "STRING", "mode": "NULLABLE" },
+  { "name": "subscription_type", "type": "STRING", "mode": "NULLABLE" },
+  { "name": "country", "type": "STRING", "mode": "NULLABLE" },
+  { "name": "registration_date", "type": "DATE", "mode": "NULLABLE" },
+  { "name": "courses_enrolled", "type": "INTEGER", "mode": "NULLABLE" },
+  { "name": "courses_completed", "type": "INTEGER", "mode": "NULLABLE" },
+  { "name": "avg_score", "type": "FLOAT", "mode": "NULLABLE" },
+  { "name": "total_time_spent_hours", "type": "FLOAT", "mode": "NULLABLE" },
+  { "name": "certificates_earned", "type": "INTEGER", "mode": "NULLABLE" }
+]
