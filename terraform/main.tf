@@ -1,7 +1,6 @@
 provider "google" {
   project     = "sampleproject-492912"
   region      = "US"
-  credentials = file("key.json")
 }
 
 # Dataset
